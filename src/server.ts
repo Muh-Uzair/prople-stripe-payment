@@ -1,4 +1,7 @@
 import app from "./app";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./config.env" });
 
 // ✅ Only listen if the file is run directly (NOT when imported by Vercel)
 if (require.main === module) {
