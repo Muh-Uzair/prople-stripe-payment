@@ -1,11 +1,51 @@
-import express, { Request, Response, NextFunction, Router } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 
 const app = express();
 app.use(morgan("dev"));
 
-app.patch("/pay-rent", (req: Request, res: Response) => {
-  res.status(200).json({ message: "paying rent" });
+// export const buyCourse = async (
+//   req: CustomRequest,
+//   res: Response,
+//   next: NextFunction
+// ): Promise<void> => {
+//   try {
+//     // 1 : take course id out
+//     if (!req.query.courseId) {
+//       return next(new AppError("Course id not provided", 400));
+//     }
+//     const { courseId } = req.query;
+
+//     // 2 : take user if out
+//     const { userId } = req.query;
+//     if (!userId) {
+//       return next(new AppError("User id not found in request object", 500));
+//     }
+
+//     // 3 : create a session
+//     const stripeSession: Stripe.Response<Stripe.Checkout.Session> | void =
+//       await createStripeSession(req, String(courseId), String(userId), next);
+
+//     res.status(200).json({
+//       stripeSession,
+//     });
+//   } catch (err: unknown) {
+//     globalAsyncCatch(err, next);
+//   }
+// };
+
+app.patch("/get-stripe-session", (req: Request, res: Response) => {
+  try {
+    res.status(200).json({
+      message: "This is a placeholder for Stripe session generation",
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Unable to generate stripe session" });
+    }
+  }
 });
 
 app.get("/test-route", (req: Request, res: Response) => {
@@ -68,34 +108,4 @@ export default app;
 //   }
 
 //   return stripeSession;
-// };
-
-// export const buyCourse = async (
-//   req: CustomRequest,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     // 1 : take course id out
-//     if (!req.query.courseId) {
-//       return next(new AppError("Course id not provided", 400));
-//     }
-//     const { courseId } = req.query;
-
-//     // 2 : take user if out
-//     const { userId } = req.query;
-//     if (!userId) {
-//       return next(new AppError("User id not found in request object", 500));
-//     }
-
-//     // 3 : create a session
-//     const stripeSession: Stripe.Response<Stripe.Checkout.Session> | void =
-//       await createStripeSession(req, String(courseId), String(userId), next);
-
-//     res.status(200).json({
-//       stripeSession,
-//     });
-//   } catch (err: unknown) {
-//     globalAsyncCatch(err, next);
-//   }
 // };
