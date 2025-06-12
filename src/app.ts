@@ -52,6 +52,10 @@ app.get("/test-route", (req: Request, res: Response) => {
   res.status(200).json({ message: "Test route is working!" });
 });
 
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Welcome to stripe-payment-prople" });
+});
+
 export default app;
 
 // export const createStripeSession = async (
