@@ -1,14 +1,18 @@
 import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 import Stripe from "stripe";
+import cors from "cors";
 
 const app = express();
 app.use(morgan("dev"));
+app.use(express.json());
+app.use(cors());
 
 export const createStripeSession = async (
   req: Request,
   next: NextFunction
 ): Promise<Stripe.Response<Stripe.Checkout.Session> | void | null> => {
+  console.log(req.body);
   // 2 : create a stripe object
   const stripe = new Stripe(process.env.STRIPE_SEC_KEY as string);
 
@@ -19,17 +23,18 @@ export const createStripeSession = async (
   // 3 : create a session with that
   const stripeSession = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    client_reference_id: "123",
-    customer_email: "muhammaduzair1062001@gmail.com", // Replace with actual user email if available
-    success_url: `${req.protocol}://${req.get("host")}/`,
+    client_reference_id: req.body.propertyId,
+    success_url: req.body.successUrl,
     line_items: [
       {
         price_data: {
           currency: "usd",
           product_data: {
-            name: "rent",
+            name: `Rent: ${req.body.propertyType.slice(0, 4)}${
+              req.body.propertyNumber
+            }`,
           },
-          unit_amount: 1000, // Replace with actual price in cents
+          unit_amount: Number(req.body.propertyRent) * 100, // Replace with actual price in cents
         },
         quantity: 1,
       },
@@ -45,7 +50,7 @@ export const createStripeSession = async (
 };
 
 app.patch(
-  "/get-stripe-session",
+  "/stripe-session",
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       // 3 : create a session
