@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 import Stripe from "stripe";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(morgan("dev"));
@@ -12,7 +14,18 @@ export const createStripeSession = async (
   req: Request,
   next: NextFunction
 ): Promise<Stripe.Response<Stripe.Checkout.Session> | void | null> => {
-  console.log(req.body);
+  // console.log("request body");
+  // console.log(req.body);
+
+  console.log("stripe secret key");
+  console.log(process.env.STRIPE_SEC_KEY);
+
+  if (
+    process.env.STRIPE_SEC_KEY === undefined ||
+    process.env.STRIPE_SEC_KEY.length <= 0
+  ) {
+    throw new Error("Stripe secret key is not set in environment variables");
+  }
   // 2 : create a stripe object
   const stripe = new Stripe(process.env.STRIPE_SEC_KEY as string);
 
@@ -23,18 +36,18 @@ export const createStripeSession = async (
   // 3 : create a session with that
   const stripeSession = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    client_reference_id: req.body.propertyId,
-    success_url: req.body.successUrl,
+    client_reference_id: req.body?.propertyId,
+    success_url: req.body?.successUrl,
     line_items: [
       {
         price_data: {
           currency: "usd",
           product_data: {
-            name: `Rent: ${req.body.propertyType.slice(0, 4)}${
-              req.body.propertyNumber
+            name: `Rent: ${req.body?.propertyType.slice(0, 4)}${
+              req.body?.propertyNumber
             }`,
           },
-          unit_amount: Number(req.body.propertyRent) * 100, // Replace with actual price in cents
+          unit_amount: Number(req.body?.propertyRent) * 100, // Replace with actual price in cents
         },
         quantity: 1,
       },
